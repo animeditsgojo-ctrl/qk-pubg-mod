@@ -17,47 +17,17 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Install Android SDK
-        run: |
-          sudo apt-get install -y wget unzip
-          wget -q https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
-          unzip -q commandlinetools-linux-11076708_latest.zip
-          mkdir -p $HOME/android-sdk/cmdline-tools/latest
-          mv cmdline-tools/* $HOME/android-sdk/cmdline-tools/latest/
-          echo "ANDROID_HOME=$HOME/android-sdk" >> $GITHUB_ENV
-          echo "$HOME/android-sdk/cmdline-tools/latest/bin" >> $GITHUB_PATH
-          echo "$HOME/android-sdk/platform-tools" >> $GITHUB_PATH
-          yes | sdkmanager --licenses || true
-          sdkmanager "platforms;android-33" "build-tools;33.0.2"
-
       - name: Download XposedBridgeApi
         run: |
           mkdir -p app/libs
           curl -L -o app/libs/XposedBridgeApi-89.jar \
             https://github.com/rovo89/XposedBridge/releases/download/art-b89/XposedBridgeApi-89.jar
 
-      - name: Setup Gradle Wrapper
+      - name: Install Gradle
         run: |
-          mkdir -p gradle/wrapper
-          curl -L -o gradle/wrapper/gradle-wrapper.jar \
-            https://raw.githubusercontent.com/gradle/gradle/v8.4.0/gradle/wrapper/gradle-wrapper.jar
-          
-          cat > gradle/wrapper/gradle-wrapper.properties << 'EOF'
-          distributionBase=GRADLE_USER_HOME
-          distributionPath=wrapper/dists
-          distributionUrl=https\://services.gradle.org/distributions/gradle-8.4-bin.zip
-          zipStoreBase=GRADLE_USER_HOME
-          zipStorePath=wrapper/dists
-          EOF
-          
-          cat > gradlew << 'GRADLEW'
-          #!/usr/bin/env sh
-          GRADLE_OPTS=""
-          exec java $GRADLE_OPTS \
-            -classpath "$APP_HOME/gradle/wrapper/gradle-wrapper.jar" \
-            org.gradle.wrapper.GradleWrapperMain "$@"
-          GRADLEW
-          chmod +x gradlew
+          wget -q https://services.gradle.org/distributions/gradle-8.4-bin.zip
+          unzip -q gradle-8.4-bin.zip -d /opt/gradle
+          echo "/opt/gradle/gradle-8.4/bin" >> $GITHUB_PATH
 
       - name: Create settings.gradle
         run: |
@@ -67,7 +37,7 @@ jobs:
           EOF
 
       - name: Build APK
-        run: ./gradlew assembleDebug --no-daemon --stacktrace
+        run: gradle assembleDebug --no-daemon --stacktrace
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
