@@ -17,17 +17,26 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Download XposedBridgeApi
-        run: |
-          mkdir -p app/libs
-          curl -L -o app/libs/XposedBridgeApi-89.jar \
-            https://github.com/rovo89/XposedBridge/releases/download/art-b89/XposedBridgeApi-89.jar
-
       - name: Install Gradle
         run: |
           wget -q https://services.gradle.org/distributions/gradle-8.4-bin.zip
           unzip -q gradle-8.4-bin.zip -d /opt/gradle
           echo "/opt/gradle/gradle-8.4/bin" >> $GITHUB_PATH
+
+      - name: Download XposedBridgeApi
+        run: |
+          mkdir -p app/libs
+          curl -L -o app/libs/XposedBridgeApi-89.jar \
+            https://github.com/rovo89/XposedBridge/releases/download/art-b89/XposedBridgeApi-89.jar
+          ls -la app/libs/
+
+      - name: Verify jar exists
+        run: |
+          if [ ! -f app/libs/XposedBridgeApi-89.jar ]; then
+            echo "JAR MISSING"
+            exit 1
+          fi
+          echo "JAR OK: $(du -h app/libs/XposedBridgeApi-89.jar)"
 
       - name: Create settings.gradle
         run: |
