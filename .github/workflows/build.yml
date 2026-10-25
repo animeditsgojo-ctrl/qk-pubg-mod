@@ -26,8 +26,8 @@ jobs:
       - name: Download XposedBridgeApi
         run: |
           mkdir -p app/libs
-          curl -L -o app/libs/XposedBridgeApi-89.jar \
-            https://github.com/rovo89/XposedBridge/releases/download/art-b89/XposedBridgeApi-89.jar
+                   curl -L -o app/libs/XposedBridgeApi-89.jar \
+            https://jitpack.io/com/github/rovo89/XposedBridge/89/XposedBridge-89.jar
           ls -la app/libs/
 
       - name: Verify jar exists
